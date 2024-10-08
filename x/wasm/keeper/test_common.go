@@ -308,6 +308,7 @@ func createTestInput(
 		appCodec,
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		runtime.NewTransientKVStoreService(tkeys[banktypes.TStoreKey]),
+		storetypes.NewObjectStoreKey(banktypes.ObjectStoreKey),
 		accountKeeper,
 		blockedAddrs,
 		authtypes.NewModuleAddress(banktypes.ModuleName).String(),
