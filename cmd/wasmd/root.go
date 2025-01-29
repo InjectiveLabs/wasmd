@@ -123,8 +123,10 @@ func NewRootCmd() *cobra.Command {
 
 	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()
-	initClientCtx, _ = config.ReadFromClientConfig(initClientCtx)
-	autoCliOpts.ClientCtx = initClientCtx
+	autoCliOpts.AddressCodec = initClientCtx.AddressCodec
+	autoCliOpts.ValidatorAddressCodec = initClientCtx.ValidatorAddressCodec
+	autoCliOpts.ConsensusAddressCodec = initClientCtx.ConsensusAddressCodec
+	autoCliOpts.Cdc = initClientCtx.Codec
 
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)

@@ -263,7 +263,7 @@ func createTestInput(
 	for _, v := range keys {
 		ms.MountStoreWithDB(v, storetypes.StoreTypeIAVL, db)
 	}
-	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
+	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey, banktypes.TStoreKey)
 	for _, v := range tkeys {
 		ms.MountStoreWithDB(v, storetypes.StoreTypeTransient, db)
 	}
@@ -400,6 +400,7 @@ func createTestInput(
 		runtime.NewEnvironment(runtime.NewKVStoreService(keys[banktypes.StoreKey]), logger.With(log.ModuleKey, "x/bank")),
 		appCodec,
 		accountKeeper,
+		runtime.NewTransientStoreService(tkeys[banktypes.TStoreKey]),
 		blockedAddrs,
 		authtypes.NewModuleAddress(banktypes.ModuleName).String(),
 	)
@@ -460,7 +461,7 @@ func createTestInput(
 
 	ibcKeeper := ibckeeper.NewKeeper(
 		appCodec,
-		runtime.NewKVStoreService(keys[ibcexported.StoreKey]),
+		runtime.NewEnvironment(runtime.NewKVStoreService(keys[ibcexported.StoreKey]), logger.With(log.ModuleKey, "x/ibc")),
 		subspace(ibcexported.ModuleName),
 		upgradeKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -495,7 +496,9 @@ func createTestInput(
 	poolKeeper := poolkeeper.NewKeeper(
 		appCodec,
 		runtime.NewEnvironment(runtime.NewKVStoreService(keys[pooltypes.StoreKey]), logger.With(log.ModuleKey, "x/protocolpool")),
-		accountKeeper, bankKeeper, stakingKeeper, govModuleAddr,
+		accountKeeper,
+		bankKeeper,
+		govModuleAddr,
 	)
 
 	govKeeper := govkeeper.NewKeeper(

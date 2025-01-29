@@ -10,12 +10,12 @@ import (
 	math_bits "math/bits"
 
 	_ "github.com/cosmos/cosmos-proto"
-	types "github.com/cosmos/cosmos-sdk/codec/types"
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
-	types1 "github.com/cosmos/cosmos-sdk/types"
+	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
+	any "github.com/cosmos/gogoproto/types/any"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -222,11 +222,11 @@ type ContractGrant struct {
 	Contract string `protobuf:"bytes,1,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Limit defines execution limits that are enforced and updated when the grant
 	// is applied. When the limit lapsed the grant is removed.
-	Limit *types.Any `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Limit *any.Any `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Filter define more fine-grained control on the message payload passed
 	// to the contract in the operation. When no filter applies on execution, the
 	// operation is prohibited.
-	Filter *types.Any `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
+	Filter *any.Any `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
 }
 
 func (m *ContractGrant) Reset()         { *m = ContractGrant{} }
@@ -1667,7 +1667,7 @@ func (m *ContractGrant) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Limit == nil {
-				m.Limit = &types.Any{}
+				m.Limit = &any.Any{}
 			}
 			if err := m.Limit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1703,7 +1703,7 @@ func (m *ContractGrant) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Filter == nil {
-				m.Filter = &types.Any{}
+				m.Filter = &any.Any{}
 			}
 			if err := m.Filter.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1859,7 +1859,7 @@ func (m *MaxFundsLimit) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amounts = append(m.Amounts, types1.Coin{})
+			m.Amounts = append(m.Amounts, types.Coin{})
 			if err := m.Amounts[len(m.Amounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1963,7 +1963,7 @@ func (m *CombinedLimit) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amounts = append(m.Amounts, types1.Coin{})
+			m.Amounts = append(m.Amounts, types.Coin{})
 			if err := m.Amounts[len(m.Amounts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

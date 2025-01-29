@@ -152,6 +152,11 @@ func (k Keeper) GetGasRegister() types.GasRegister {
 	return k.gasRegister
 }
 
+// Cleanup is used to release cache lock of VM instance
+func (k Keeper) Cleanup() {
+	k.wasmVM.Cleanup()
+}
+
 func (k Keeper) create(ctx context.Context, creator sdk.AccAddress, wasmCode []byte, instantiateAccess *types.AccessConfig, authZ types.AuthorizationPolicy) (codeID uint64, checksum []byte, err error) {
 	if creator == nil {
 		return 0, checksum, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "cannot be nil")
@@ -203,6 +208,12 @@ func (k Keeper) create(ctx context.Context, creator sdk.AccAddress, wasmCode []b
 		evt.AppendAttributes(sdk.NewAttribute(types.AttributeKeyRequiredCapability, strings.TrimSpace(f)))
 	}
 	sdkCtx.EventManager().EmitEvent(evt)
+	sdkCtx.EventManager().EmitTypedEvent(&types.EventCodeStored{
+		CodeID:       codeID,
+		Creator:      creator.String(),
+		AccessConfig: instantiateAccess,
+		Checksum:     checksum,
+	})
 
 	return codeID, checksum, nil
 }
@@ -398,6 +409,16 @@ func (k Keeper) instantiate(
 		return nil, nil, errorsmod.Wrap(err, "dispatch")
 	}
 
+	sdkCtx.EventManager().EmitTypedEvent(&types.EventContractInstantiated{
+		ContractAddress: contractAddress.String(),
+		Admin:           contractInfo.Admin,
+		CodeID:          contractInfo.CodeID,
+		Funds:           deposit,
+		Msg:             initMsg,
+		Label:           label,
+		Creator:         contractInfo.Creator,
+	})
+
 	return contractAddress, data, nil
 }
 
@@ -563,6 +584,12 @@ func (k Keeper) migrate(
 		}
 		return data, nil
 	}
+
+	sdkCtx.EventManager().EmitTypedEvent(&types.EventContractMigrated{
+		CodeID:          newCodeID,
+		ContractAddress: contractAddress.String(),
+		Msg:             msg,
+	})
 
 	return data, nil
 }
